@@ -113,6 +113,12 @@ template "#{node['logstash']['basedir']}/agent/etc/shipper.conf" do
   notifies :restart, "service[logstash_agent]"
 end
 
+# Create symlink to agent config called logstash.conf (agent process looks for logstash.conf)
+link "/opt/logstash/agent/etc/logstash.conf" do
+  to "/opt/logstash/agent/etc/shipper.conf"
+  notifies :restart, "service[logstash_agent]"
+end
+
 logrotate_app "logstash" do
   path "#{node['logstash']['basedir']}/agent/log/*.log"
   frequency "daily"

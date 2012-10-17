@@ -1,0 +1,7 @@
+AuthUserFile /opt/needle/shared/htpasswd
+AuthName "Restricted Access"
+AuthType Basic
+Require valid-user
+satisfy any
+deny from all
+allow from 67.137.133.50

@@ -67,4 +67,12 @@ template "#{node['logstash']['basedir']}/kibana/current/config.php" do
   variables(:es_server_ip => es_server_ip)
 end
 
+# Create htaccess file to restrict access
+cookbook_file "/opt/logstash/kibana/current/.htaccess" do
+  source 'htaccess'
+  action :create
+  owner node[:apache][:user]
+  group node[:apache][:group]
+end
+
 service "apache2"
