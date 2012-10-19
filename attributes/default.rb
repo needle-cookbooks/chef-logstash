@@ -1,6 +1,7 @@
 default['logstash']['basedir'] = "/opt/logstash"
 default['logstash']['user'] = "logstash"
 default['logstash']['group'] = "logstash"
+default['logstash']['setuid'] = "root"
 default['logstash']['log_dir'] = "/var/log/logstash"
 default['logstash']['pid_dir'] = "/var/run/logstash"
 

@@ -8,7 +8,7 @@ respawn
 respawn limit 5 30
 
 chdir <%= node[:logstash][:basedir] %>/server
-setuid <%= node[:logstash][:user] %>
+setuid <%= node[:logstash][:setuid] %>
 
 script
   export LOGSTASH_HOME="<%= node[:logstash][:basedir] %>/server"
