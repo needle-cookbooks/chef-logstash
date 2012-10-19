@@ -6,6 +6,7 @@ NameVirtualHost *:<%= node[:logstash][:kibana][:http_port] %>
 
 	<Directory "<%= @docroot %>">
 		DirectoryIndex index.php
+		AllowOverride All
 	</Directory>
 
 </VirtualHost>
