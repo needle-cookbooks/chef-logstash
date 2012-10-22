@@ -9,11 +9,11 @@ def set_amqp_user_and_pass(attrib, secrets)
 	return attrib
 end
 
-if node.role? 'logstash_server'
+if node.roles.include? 'logstash_server'
 	node.logstash.server.inputs.each do |input|
 		input = set_amqp_user_and_pass(input, secrets)
 	end
-elsif node.role? 'logstash_agent'
+elsif node.roles.include? 'logstash_agent'
 	node.logstash.agent.outputs.each do |output|
 		output = set_amqp_user_and_pass(output, secrets)
 	end
