@@ -11,7 +11,14 @@ input {
         <% input.each do |name,hash| -%> 
              <%= name %> {
                  <% hash.each do |k,v| -%>         
+                    <% case v.class.to_s -%>
+                    <% when "String" -%>
                        <%= k %> => '<%= v %>'
+                    <% when "Array" -%>
+                       <%= k %> => <%= v.inspect %>
+                    <% when "Trueclass", "FalseClass", "Fixnum" -%>
+                       <%= k %> => <%= v %>                    
+                    <% end -%>
                  <% end -%>
         <% end -%>
         }
@@ -24,8 +31,15 @@ filter {
    <% node['logstash']['server']['filters'].each do |filter| -%>
       <% filter.each do |name,hash| -%> 
          <%= name %> {
-           <% hash.each do |k,v| -%>         
-             <%= k %> => '<%= v %>'
+             <% hash.each do |k,v| -%>         
+                <% case v.class.to_s -%>
+                <% when "String" -%>
+                   <%= k %> => '<%= v %>'
+                <% when "Array" -%>
+                   <%= k %> => <%= v.inspect %>
+                <% when "Trueclass", "FalseClass", "Fixnum" -%>
+                   <%= k %> => <%= v %>                    
+                <% end -%>
            <% end -%>
       <% end -%>
               }
