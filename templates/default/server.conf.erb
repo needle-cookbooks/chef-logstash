@@ -12,12 +12,10 @@ input {
              <%= name %> {
                  <% hash.each do |k,v| -%>         
                     <% case v.class.to_s -%>
-                    <% when "String" -%>
-                       <%= k %> => '<%= v %>'
                     <% when "Array" -%>
                        <%= k %> => <%= v.inspect %>
-                    <% when "Trueclass", "FalseClass", "Fixnum" -%>
-                       <%= k %> => <%= v %>                    
+                    <% else -%>
+                       <%= k %> => '<%= v %>'
                     <% end -%>
                  <% end -%>
         <% end -%>
@@ -33,12 +31,10 @@ filter {
          <%= name %> {
              <% hash.each do |k,v| -%>         
                 <% case v.class.to_s -%>
-                <% when "String" -%>
-                   <%= k %> => '<%= v %>'
                 <% when "Array" -%>
                    <%= k %> => <%= v.inspect %>
-                <% when "Trueclass", "FalseClass", "Fixnum" -%>
-                   <%= k %> => <%= v %>                    
+                <% else -%>
+                   <%= k %> => '<%= v %>'
                 <% end -%>
            <% end -%>
       <% end -%>

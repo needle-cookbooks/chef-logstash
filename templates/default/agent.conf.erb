@@ -16,7 +16,12 @@ input {
         <% input.each do |name,hash| -%> 
              <%= name %> {
                  <% hash.each do |k,v| -%>         
+                    <% case v.class.to_s -%>
+                    <% when "Array" -%>
+                       <%= k %> => <%= v.inspect %>
+                    <% else -%>
                        <%= k %> => '<%= v %>'
+                    <% end -%>
                  <% end -%>
         <% end -%>
         }
