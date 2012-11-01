@@ -15,7 +15,7 @@ input {
                     <% when "Array" -%>
                        <%= k %> => <%= v.inspect %>
                     <% else -%>
-                       <%= k %> => "<%= v %>"
+                       <%= k %> => '<%= v %>'
                     <% end -%>
                  <% end -%>
         <% end -%>
@@ -34,7 +34,7 @@ filter {
                 <% when "Array" -%>
                    <%= k %> => <%= v.inspect %>
                 <% else -%>
-                   <%= k %> => "<%= v %>"
+                   <%= k %> => '<%= v %>'
                 <% end -%>
            <% end -%>
       <% end -%>
