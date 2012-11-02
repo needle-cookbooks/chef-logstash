@@ -119,6 +119,7 @@ end
 link "/opt/logstash/agent/etc/logstash.conf" do
   to "/opt/logstash/agent/etc/shipper.conf"
   notifies :restart, "service[logstash_agent]"
+end
 
 directory node['logstash']['log_dir'] do
   action :create
