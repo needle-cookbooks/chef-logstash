@@ -5,14 +5,50 @@ input {
     port => "5959"
     format => "json_event"
   }
+<<<<<<< HEAD
+  <% else %>    
+    <% node['logstash']['server']['inputs'].each do |input| -%>
+     
+        <% input.each do |name,hash| -%> 
+             <%= name %> {
+                 <% hash.each do |k,v| -%>         
+                    <% case v.class.to_s -%>
+                    <% when "Array" -%>
+                       <%= k %> => <%= v.inspect %>
+                    <% else -%>
+                       <%= k %> => '<%= v %>'
+                    <% end -%>
+                 <% end -%>
+        <% end -%>
+        }
+     <% end -%>
+=======
   <% else -%> 
     <%= LogstashConf.section_to_str(node['logstash']['server']['inputs']) %>
+>>>>>>> upstream/master
   <% end -%>
 }
 
 <% unless node['logstash']['server']['filters'].empty? -%>
 filter {
+<<<<<<< HEAD
+   <% node['logstash']['server']['filters'].each do |filter| -%>
+      <% filter.each do |name,hash| -%> 
+         <%= name %> {
+             <% hash.each do |k,v| -%>         
+                <% case v.class.to_s -%>
+                <% when "Array" -%>
+                   <%= k %> => <%= v.inspect %>
+                <% else -%>
+                   <%= k %> => '<%= v %>'
+                <% end -%>
+           <% end -%>
+      <% end -%>
+              }
+   <% end -%>
+=======
   <%= LogstashConf.section_to_str(node['logstash']['server']['filters']) %>
+>>>>>>> upstream/master
 }
 <% end -%>
 
