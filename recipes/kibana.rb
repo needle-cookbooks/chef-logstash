@@ -39,7 +39,7 @@ git "#{node['logstash']['basedir']}/kibana/#{kibana_version}" do
   group node['logstash']['group']
 end
 
-if platform? "centos", "redhat", "amazon"
+if platform? "redhat", "centos", "amazon", "fedora", "scientific"
   arch = node['kernel']['machine']    == "x86_64" ? "64" : ""
   file '/etc/httpd/mods-available/php5.load' do
     content "LoadModule php5_module /usr/lib#{arch}/httpd/modules/libphp5.so"
@@ -57,7 +57,7 @@ template "#{node['apache']['dir']}/sites-available/kibana" do
             :server_name => node['logstash']['kibana']['server_name'])
 end
 
-apache_site "kibana" 
+apache_site "kibana"
 
 template "#{node['logstash']['basedir']}/kibana/current/config.php" do
   source node['logstash']['kibana']['config']

@@ -8,15 +8,15 @@ include_recipe "logstash::default"
 # check if running chef-solo.  If not, detect the logstash server/ip by role.  If I can't do that, fall back to using ['logstash']['agent']['server_ipaddress']
 if Chef::Config[:solo]
   logstash_server_ip = node['logstash']['agent']['server_ipaddress']
-else 
-logstash_server_results = search(:node, "roles:#{node['logstash']['agent']['server_role']}")
-    unless logstash_server_results.empty?
-        logstash_server_ip = logstash_server_results[0]['ipaddress']
-    else 
-        logstash_server_ip = node['logstash']['agent']['server_ipaddress']
-    end
+else
+  logstash_server_results = search(:node, "roles:#{node['logstash']['agent']['server_role']}")
+  unless logstash_server_results.empty?
+    logstash_server_ip = logstash_server_results[0]['ipaddress']
+  else
+    logstash_server_ip = node['logstash']['agent']['server_ipaddress']
+  end
 end
-  
+
 directory "#{node['logstash']['basedir']}/agent" do
   action :create
   mode "0755"
@@ -51,13 +51,13 @@ directory "#{node['logstash']['basedir']}/agent/etc/patterns" do
   group node['logstash']['group']
 end
 
-
 if platform?  "debian", "ubuntu"
   if node["platform_version"] == "12.04"
     template "/etc/init/logstash_agent.conf" do
       mode "0644"
       source "logstash_agent.conf.erb"
     end
+
     service "logstash_agent" do
       provider Chef::Provider::Service::Upstart
       action [ :enable, :start ]
@@ -65,17 +65,18 @@ if platform?  "debian", "ubuntu"
   else
     runit_service "logstash_agent"
   end
-elsif platform? "redhat", "centos", "amazon", "fedora"
+elsif platform? "redhat", "centos", "amazon", "fedora", "scientific"
   template "/etc/init.d/logstash_agent" do
     source "init.erb"
     owner "root"
     group "root"
     mode "0774"
     variables(
-              :config_file => "shipper.conf",
-              :basedir => "#{node['logstash']['basedir']}/agent"
-              )
+      :config_file => "shipper.conf",
+      :basedir => "#{node['logstash']['basedir']}/agent"
+    )
   end
+
   service "logstash_agent" do
     supports :restart => true, :reload => true, :status => true
     action :enable
@@ -90,6 +91,7 @@ if node['logstash']['agent']['install_method'] == "jar"
     source node['logstash']['agent']['source_url']
     checksum  node['logstash']['agent']['checksum']
   end
+
   link "#{node['logstash']['basedir']}/agent/lib/logstash.jar" do
     to "#{node['logstash']['basedir']}/agent/lib/logstash-#{node['logstash']['agent']['version']}.jar"
     notifies :restart, "service[logstash_agent]"
@@ -117,13 +119,20 @@ end
 link "/opt/logstash/agent/etc/logstash.conf" do
   to "/opt/logstash/agent/etc/shipper.conf"
   notifies :restart, "service[logstash_agent]"
+
+directory node['logstash']['log_dir'] do
+  action :create
+  mode "0755"
+  owner node['logstash']['user']
+  group node['logstash']['group']
+  recursive true
 end
 
 logrotate_app "logstash" do
-  path "#{node['logstash']['basedir']}/agent/log/*.log"
+  path "#{node['logstash']['log_dir']}/*.log"
   frequency "daily"
   rotate "30"
-  create "664 #{node['logstash']['user']} #{node['logstash']['user']}"
+  create "664 #{node['logstash']['user']} #{node['logstash']['group']}"
   notifies :restart, "service[rsyslog]"
 end
 

@@ -1,5 +1,5 @@
-NameVirtualHost *:<%= node[:logstash][:kibana][:http_port] %>
-<VirtualHost *:<%= node[:logstash][:kibana][:http_port] %>>
+NameVirtualHost *:<%= node['logstash']['kibana']['http_port'] %>
+<VirtualHost *:<%= node['logstash']['kibana']['http_port'] %>>
   ServerName <%= @server_name %>
 	DocumentRoot "<%= @docroot %>"
 	
@@ -8,5 +8,4 @@ NameVirtualHost *:<%= node[:logstash][:kibana][:http_port] %>
 		DirectoryIndex index.php
 		AllowOverride All
 	</Directory>
-
 </VirtualHost>
