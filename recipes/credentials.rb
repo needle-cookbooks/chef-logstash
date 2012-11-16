@@ -13,8 +13,8 @@ if node.roles.include? 'logstash_server'
 	node.logstash.server.inputs.each do |input|
 		input = set_amqp_user_and_pass(input, secrets)
 	end
-elsif node.roles.include? 'logstash_agent'
-	node.logstash.agent.outputs.each do |output|
+elsif node.roles.include? 'logstash_beaver'
+	node.logstash.beaver.outputs.each do |output|
 		output = set_amqp_user_and_pass(output, secrets)
 	end
 end
