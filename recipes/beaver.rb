@@ -97,7 +97,7 @@ node['logstash']['beaver']['outputs'].each do |outs|
         env << "RABBITMQ_PORT=#{hash['port']}" if hash.has_key?('port')
         env << "RABBITMQ_USERNAME=#{hash['user']}" if hash.has_key?('user')
         env << "RABBITMQ_PASSWORD=#{hash['pass']}" if hash.has_key?('pass')
-        env << "RABBITMQ_QUEUE=#{hash['vhost']}" if hash.has_key?('vhost') # ??
+        env << "RABBITMQ_VHOST=#{hash['vhost']}" if hash.has_key?('vhost') # ??
         env << "RABBITMQ_KEY=#{hash['key']}" if hash.has_key?('key')
         env << "RABBITMQ_EXCHANGE=#{hash['name']}" if hash.has_key?('name')
       when "redis" then
