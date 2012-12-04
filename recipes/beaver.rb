@@ -100,6 +100,8 @@ node['logstash']['beaver']['outputs'].each do |outs|
         env << "RABBITMQ_VHOST=#{hash['vhost']}" if hash.has_key?('vhost') # ??
         env << "RABBITMQ_KEY=#{hash['key']}" if hash.has_key?('key')
         env << "RABBITMQ_EXCHANGE=#{hash['name']}" if hash.has_key?('name')
+        env << "RABBITMQ_EXCHANGE_DURABLE=#{hash['exchange_durable']}" if hash.has_key?('exchange_durable')
+        env << "RABBITMQ_QUEUE_DURABLE=#{hash['queue_durable']}" if hash.has_key?('queue_durable')
       when "redis" then
         outputs << "redis"
         host = hash['host'] || logstash_server_ip || 'localhost'
@@ -133,7 +135,7 @@ template "/etc/init.d/logstash_beaver" do
   variables(
             :cmd => cmd,
             :pid_file => pid_file,
-            :user => node['logstash']['user'],
+            :user => node['logstash']['beaver']['user'],
             :log => log_file,
             :platform => node['platform']
             )
