@@ -1,10 +1,10 @@
 data_bag_key = Chef::EncryptedDataBagItem.load_secret(node['data_bag_key'])
 secrets = Chef::EncryptedDataBagItem.load("secrets", node.chef_environment, data_bag_key)
 
-def set_amqp_user_and_pass(attrib, secrets)
-	if attrib and attrib.has_key? 'amqp'
-		attrib['amqp']['user'] = secrets['logstash']['amqp']['user']
-		attrib['amqp']['password'] = secrets['logstash']['amqp']['password']
+def set_rabbitmq_user_and_pass(attrib, secrets)
+	if attrib and attrib.has_key? 'rabbitmq'
+		attrib['rabbitmq']['user'] = secrets['logstash']['rabbitmq']['user']
+		attrib['rabbitmq']['password'] = secrets['logstash']['rabbitmq']['password']
 	end
 	return attrib
 end
