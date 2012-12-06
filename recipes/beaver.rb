@@ -5,6 +5,7 @@
 #
 include_recipe "logstash::default"
 include_recipe "python::default"
+include_recipe "apt::default"
 
 git_package = 'git'
 
