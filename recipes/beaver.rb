@@ -34,6 +34,12 @@ if platform?("ubuntu")
   end
 end
 
+%w{argparse pika}.each do |pypkg|
+  python_pip pypkg do
+    action :install
+  end
+end
+
 package git_package
 package 'libzmq-dev'
 
