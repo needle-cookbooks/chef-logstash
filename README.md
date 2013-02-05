@@ -31,8 +31,14 @@ Attributes
 * `node['logstash']['group']` - the group for all Logstash components
 * `node['logstash']['graphite_role']` - the Chef role to search for
   discovering your preexisting Graphite server
+* `node['logstash']['graphite_query']` - the search query used for
+  discovering your preexisting Graphite server. Defaults to 
+  node['logstash']['graphite_role'] in the current node environment
 * `node['logstash']['elasticsearch_role']` - the Chef role to search
   for discovering your preexisting ElasticSearch cluster.
+* `node['logstash']['elasticsearch_query']` - the search query used for
+  discovering your preexisting ElasticSearch cluster. Defaults to 
+  node['logstash']['elasticsearch_role'] in the current node environment
 * `node['logstash']['elasticsearch_cluster']` - the cluster name
   assigned to your preexisting ElasticSearch cluster. Only applies to
   external ES clusters.
@@ -44,6 +50,7 @@ Attributes
   groups to join. Usefull to gain read privileges on some logfiles.
 * `node['logstash']['patterns']` - A hash with grok patterns to be
   used on grok and multiline filters.
+* `node['logstash']['create_account']` - create the account info from `user` and `group`; this is `true` by default. Disable it to use an existing account!
 
 ## Agent
 
