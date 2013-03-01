@@ -5,50 +5,44 @@
 #
 include_recipe "logstash::default"
 include_recipe "python::default"
-include_recipe "apt::default"
+include_recipe "logrotate"
 
-git_package = 'git'
-
-if platform?("ubuntu") 
-  if node['platform_version'].to_f <= 11.04
-    apt_repository "lucid-zeromq-ppa" do
+if node['logstash']['agent']['install_zeromq']
+  case
+  when platform_family?("rhel")
+    include_recipe "yumrepo::zeromq"
+  when platform_family?("debian")
+    apt_repository "zeromq-ppa" do
       uri "http://ppa.launchpad.net/chris-lea/zeromq/ubuntu"
-      distribution "lucid"
+      distribution node['lsb']['codename']
       components ["main"]
       keyserver "keyserver.ubuntu.com"
       key "C7917B12"
       action :add
     end
-    apt_repository "lucid-libpgm-ppa" do
+    apt_repository "libpgm-ppa" do
       uri "http://ppa.launchpad.net/chris-lea/libpgm/ubuntu"
-      distribution "lucid"
+      distribution  node['lsb']['codename']
       components ["main"]
       keyserver "keyserver.ubuntu.com"
       key "C7917B12"
       action :add
-      notifies :run, resources(:execute => "apt-get update"), :immediately
+      notifies :run, "execute[apt-get update]", :immediately
     end
   end
-
-  if node['platform_version'].to_f <= 10.04
-    git_package = 'git-core'
-  end
-end
-
-%w{argparse pika}.each do |pypkg|
-  python_pip pypkg do
+  node['logstash']['server']['zeromq_packages'].each {|p| package p }
+  python_pip node['logstash']['beaver']['zmq']['pip_package'] do
     action :install
   end
 end
 
-package git_package
-package 'libzmq-dev'
+package 'git'
 
 basedir = node['logstash']['basedir'] + '/beaver'
 
 conf_file = "#{basedir}/etc/beaver.conf"
-log_file = "#{basedir}/log/logstash_beaver.log"
-pid_file = "#{basedir}/run/logstash_beaver.pid"
+log_file = "#{node['logstash']['log_dir']}/logstash_beaver.log"
+pid_file = "#{node['logstash']['pid_dir']}/logstash_beaver.pid"
 
 logstash_server_ip = nil
 if Chef::Config[:solo]
@@ -67,6 +61,7 @@ directory basedir do
   group node['logstash']['group']
   recursive true
 end
+
 [
   File.dirname(conf_file),
   File.dirname(log_file),
@@ -79,6 +74,7 @@ end
     not_if do ::File.exists?(dir) end
   end
 end
+
 [ log_file, pid_file ].each do |f|
   file f do
     action :touch
@@ -88,7 +84,7 @@ end
   end
 end
 
-python_pip node['logstash']['beaver']['repo'] do
+python_pip node['logstash']['beaver']['pip_package'] do
   action :install
 end
 
@@ -115,7 +111,7 @@ conf = {}
 node['logstash']['beaver']['outputs'].each do |outs|
   outs.each do |name, hash|
     case name
-      when "rabbitmq", "amq" then
+      when "rabbitmq", "amqp" then
         outputs << "rabbitmq"
         host = hash['host'] || logstash_server_ip || 'localhost'
         conf['rabbitmq_host'] = hash['host'] if hash.has_key?('host')
@@ -128,7 +124,7 @@ node['logstash']['beaver']['outputs'].each do |outs|
         conf['rabbitmq_exchange_type'] = hash['rabbitmq_exchange_type'] if hash.has_key?('rabbitmq_exchange_type')
         conf['rabbitmq_exchange'] = hash['exchange'] if hash.has_key?('exchange')
         conf['rabbitmq_exchange_durable'] = hash['durable'] if hash.has_key?('durable')
-        conf['rabbitmq_key'] = hash['key'] if hash.has_key?('key') # ??
+        conf['rabbitmq_key'] = hash['key'] if hash.has_key?('key')
       when "redis" then
         outputs << "redis"
         host = hash['host'] || logstash_server_ip || 'localhost'
@@ -185,15 +181,12 @@ service "logstash_beaver" do
   action [:enable, :start]
 end
 
-template '/etc/logrotate.d/logstash_beaver' do
-  source 'logrotate-beaver.erb'
-  owner 'root'
-  group 'root'
-  mode '0440'
-  variables(
-            :logfile => log_file,
-            :user => node['logstash']['user'],
-            :group => node['logstash']['group']
-            )
+logrotate_app "logstash_beaver" do
+  cookbook "logrotate"
+  path log_file
+  frequency "daily"
+  postrotate "invoke-rc.d logstash_beaver force-reload >/dev/null 2>&1 || true"
+  options [ "delaycompress", "missingok", "notifempty" ]
+  rotate 30
+  create "0440 #{node['logstash']['user']} #{node['logstash']['group']}"
 end
-
