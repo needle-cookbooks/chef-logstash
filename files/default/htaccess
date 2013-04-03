@@ -4,4 +4,4 @@ AuthType Basic
 Require valid-user
 satisfy any
 deny from all
-allow from 67.137.133.50
+allow from 216.51.24.242
