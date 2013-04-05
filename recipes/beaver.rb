@@ -30,7 +30,7 @@ if node['logstash']['agent']['install_zeromq']
       notifies :run, "execute[apt-get update]", :immediately
     end
   end
-  node['logstash']['server']['zeromq_packages'].each {|p| package p }
+  node['logstash']['zeromq_packages'].each {|p| package p }
   python_pip node['logstash']['beaver']['zmq']['pip_package'] do
     action :install
   end
@@ -47,6 +47,8 @@ pid_file = "#{node['logstash']['pid_dir']}/logstash_beaver.pid"
 logstash_server_ip = nil
 if Chef::Config[:solo]
   logstash_server_ip = node['logstash']['beaver']['server_ipaddress'] if node['logstash']['beaver']['server_ipaddress']
+elsif !node['logstash']['beaver']['server_ipaddress'].nil?
+  logstash_server_ip = node['logstash']['beaver']['server_ipaddress']
 elsif node['logstash']['beaver']['server_role']
   logstash_server_results = search(:node, "roles:#{node['logstash']['beaver']['server_role']}")
   unless logstash_server_results.empty?
@@ -182,6 +184,7 @@ when "ubuntu"
     supports_setuid = true
   end
 end
+
 if use_upstart
   template "/etc/init/logstash_beaver.conf" do
     mode "0644"
@@ -226,7 +229,7 @@ logrotate_app "logstash_beaver" do
   path log_file
   frequency "daily"
   postrotate "invoke-rc.d logstash_beaver force-reload >/dev/null 2>&1 || true"
-  options [ "delaycompress", "missingok", "notifempty" ]
+  options [ "missingok", "notifempty" ]
   rotate 30
   create "0440 #{node['logstash']['user']} #{node['logstash']['group']}"
 end

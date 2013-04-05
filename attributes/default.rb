@@ -18,3 +18,11 @@ default['logstash']['elasticsearch_port'] = ''
 default['logstash']['graphite_ip'] = ''
 
 default['logstash']['patterns'] = {}
+default['logstash']['install_zeromq'] = false
+
+case
+when platform_family?("rhel")
+  node.set['logstash']['zeromq_packages'] = [ "zeromq",  "zeromq-devel"]
+when platform_family?("debian")
+  node.set['logstash']['zeromq_packages'] = [ "zeromq",  "libzmq-dev"]
+end
