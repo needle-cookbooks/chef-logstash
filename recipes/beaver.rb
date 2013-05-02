@@ -41,6 +41,7 @@ package 'git'
 basedir = node['logstash']['basedir'] + '/beaver'
 
 conf_file = "#{basedir}/etc/beaver.conf"
+format = node['logstash']['beaver']['format']
 log_file = "#{node['logstash']['log_dir']}/logstash_beaver.log"
 pid_file = "#{node['logstash']['pid_dir']}/logstash_beaver.pid"
 
@@ -152,7 +153,7 @@ if outputs.length > 1
   log("multiple outpus detected, will consider only the first: #{output}") { level :warn }
 end
 
-cmd = "beaver  -t #{output} -c #{conf_file}"
+cmd = "beaver  -t #{output} -c #{conf_file} -F #{format}"
 
 template conf_file do
   source 'beaver.conf.erb'
@@ -178,7 +179,7 @@ when "fedora"
   if node['platform_version'].to_i >= 9
     use_upstart = true
   end
-when "ubuntu"
+when "debian"
   use_upstart = true
   if node['platform_version'].to_f >= 12.04
     supports_setuid = true
@@ -205,11 +206,6 @@ if use_upstart
     provider Chef::Provider::Service::Upstart
   end
 else
-  service "logstash_beaver" do
-    supports :restart => true, :reload => false, :status => true
-    action [:enable, :start]
-  end
-
   template "/etc/init.d/logstash_beaver" do
     mode "0755"
     source "init-beaver.erb"
@@ -221,6 +217,11 @@ else
               :platform => node['platform']
               )
     notifies :restart, "service[logstash_beaver]"
+  end
+
+  service "logstash_beaver" do
+    supports :restart => true, :reload => false, :status => true
+    action [:enable, :start]
   end
 end
 
