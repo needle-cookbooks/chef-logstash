@@ -193,7 +193,7 @@ if use_upstart
     variables(
               :cmd => cmd,
               :group => node['logstash']['group'],
-              :user => node['logstash']['user'],
+              :user => node['logstash']['beaver']['user'],
               :log => log_file,
               :supports_setuid => supports_setuid
               )
